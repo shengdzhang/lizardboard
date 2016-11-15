@@ -5,14 +5,19 @@ const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 
-const routes = require('../routes/index');
-const users = require('../routes/users');
+const db = require('./database/db');
+const session = require('express-session');
+
+const routes = require('./routes/index');
+const users = require('./routes/users');
+
+const passport = require('./auth/passport');
 
 const appRoot = process.env.APP_ROOT
 const app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, '../views'));
+app.set('views', path.join(__dirname, './views'));
 app.set('view engine', 'pug');
 
 app.set('env', process.env.PORT || '3000')
@@ -22,16 +27,19 @@ if( process.env.NODE_ENV !== 'test' ) app.use( logger( 'dev' ))
 //   keys: [[ process.env.SESSION_KEY ]]
 // }))
 // app.use(express.static(buildpath+'/public'))
-app.use(bodyParser.json())
-
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use( session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUnitialized: false
+}));
 
-app.use(express.static(path.join(__dirname, '../front_end/public')));
+app.use(express.static(path.join(__dirname, './front_end/public')));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
